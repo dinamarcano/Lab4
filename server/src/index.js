@@ -4,7 +4,7 @@ const cors = require("cors");
 const pool = require("./db/pool");  
 
 const app = express();
-app.use(cors({ origin: "http://localhost:3000" }));
+app.use(cors({ origin: (process.env.CLIENT_URL || "http://localhost:3000").split(",") }));
 app.use(express.json());
 
 const authRoutes = require("../src/routes/auth.routes");
@@ -24,6 +24,10 @@ app.get("/api/health", async (req, res) => {
   res.json({ ok: true, time: result.rows[0].now });
 });
 
-app.listen(process.env.PORT, () => {
-  console.log(`Servidor en http://localhost:${process.env.PORT}`);
-});
+if (require.main === module) {
+  app.listen(process.env.PORT, () => {
+    console.log(`Servidor en http://localhost:${process.env.PORT}`);
+  });
+}
+
+module.exports = app;
